@@ -180,13 +180,37 @@ export function FileViewerRight({
             </pre>
           ) : (
             <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                h1: (props) => <h1 className="text-2xl font-bold text-white border-b border-[#1F1F1F] pb-4 mb-8 mt-12 first:mt-0" {...props}>{highlightMatches(props.children, fileSearch)}</h1>,
-                h2: (props) => <h2 className="text-lg font-bold text-white mt-12 mb-4 border-l-2 border-[#5E6AD2] pl-4" {...props}>{highlightMatches(props.children, fileSearch)}</h2>,
-                h3: (props) => <h3 className="text-md font-bold text-white mt-10 mb-3" {...props}>{highlightMatches(props.children, fileSearch)}</h3>,
-                h4: (props) => <h4 className="text-sm font-bold text-white mt-8 mb-2" {...props}>{highlightMatches(props.children, fileSearch)}</h4>,
-                p: (props) => <p className="mb-4 leading-relaxed" {...props}>{highlightMatches(props.children, fileSearch)}</p>,
+  remarkPlugins={[remarkGfm]}
+  components={{
+                // h1: Strongest hierarchy, bottom border
+                h1: (props) => (
+                  <h1 className="text-2xl font-bold text-white mt-12 mb-8 border-b border-[#1F1F1F] pb-4 first:mt-0" {...props}>
+                    {highlightMatches(props.children, fileSearch)}
+                  </h1>
+                ),
+                // h2: Left border "accent"
+                h2: (props) => (
+                  <h2 className="text-lg font-bold text-white mt-8 mb-4 border-l-2 border-[#5E6AD2] pl-4 first:mt-0" {...props}>
+                    {highlightMatches(props.children, fileSearch)}
+                  </h2>
+                ),
+                // h3: Indented relative to h2, subtle left border or just padding
+                h3: (props) => (
+                  <h3 className="text-base font-bold text-white mt-4 mb-3 ml-2 border-l border-gray-700 pl-4 first:mt-0" {...props}>
+                    {highlightMatches(props.children, fileSearch)}
+                  </h3>
+                ),
+                // h4: Deeper indentation, no border
+                h4: (props) => (
+                  <h4 className="text-sm font-bold text-gray-300 mt-2 mb-2 ml-6 first:mt-0" {...props}>
+                    {highlightMatches(props.children, fileSearch)}
+                  </h4>
+                ),
+                p: (props) => (
+                  <p className="mb-4 leading-relaxed text-gray-400 ml-2 h2:ml-6 h3:ml-10" {...props}>
+                    {highlightMatches(props.children, fileSearch)}
+                  </p>
+                ),
                 a: (props) => <a className="text-[#5E6AD2] hover:text-[#4A56C0] underline transition-colors" target="_blank" rel="noopener noreferrer" {...props} />,
                 table: (props) => (
                   <div className="my-6 overflow-x-auto rounded-lg border border-[#5E6AD2]">

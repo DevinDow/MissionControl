@@ -1,5 +1,5 @@
 import React from 'react';
-import { Folder, BrainCog, ChevronRight, History, Users, Activity, Play, Loader2, RefreshCw } from 'lucide-react';
+import { Folder, BrainCog, ChevronRight, History, Users, Activity, Play, Loader2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 /**
@@ -11,27 +11,10 @@ import { cn } from '../../lib/utils';
  * Typical structures: 
  * - Provider / Model
  * - Host / Provider / Model
- * 
- * PERFORMANCE:
- * - Memoized to prevent re-renders on parent updates
- * - renderModelTree is wrapped in useCallback for stability
- * - Expanded folders use Set for O(1) lookup performance
  */
-function ModelsToolLeftComponent({ modelsData, modelsLoading, onSelectModel, selectedModelId, onRefresh }: any) {
+export function ModelsToolLeft({ modelsData, modelsLoading, onSelectModel, selectedModelId }: any) {
   // We use a Set to track which directory paths are currently 'expanded' in the UI.
   const [expandedFolders, setExpandedFolders] = React.useState<Set<string>>(new Set());
-
-  React.useEffect(() => {
-    if (modelsLoading) {
-      console.log('[ModelsToolLeft] Loading started');
-    } else {
-      console.log('[ModelsToolLeft] Loading finished, tree has', modelsData?.tree?.length, 'top-level nodes');
-    }
-  }, [modelsLoading]);
-
-  React.useEffect(() => {
-    console.log('[ModelsToolLeft] Render triggered. Loaded:', !!modelsData?.tree, 'Loading:', modelsLoading);
-  });
 
   // Ensure the tree opens to reveal the currently selected model.
   React.useEffect(() => {
@@ -181,18 +164,8 @@ function ModelsToolLeftComponent({ modelsData, modelsLoading, onSelectModel, sel
   // --- RENDER MAIN LIST ---
   return (
     <div className="p-4 space-y-3">
-      <div className="flex items-center gap-2 pb-2 border-b border-[#1F1F1F] justify-between">
+      <div className="flex items-center gap-2 pb-2 border-b border-[#1F1F1F]">
         <span className="text-[13px] font-medium text-[#5E6AD2]">Available Models</span>
-        {onRefresh && (
-          <button
-            onClick={onRefresh}
-            disabled={modelsLoading}
-            className="p-1 hover:bg-[#1A1A1A]/50 rounded transition-all disabled:opacity-50"
-            title="Refresh models list"
-          >
-            <RefreshCw size={14} className={cn("text-[#8A8A8A]", modelsLoading && "animate-spin")} />
-          </button>
-        )}
       </div>
 
       {/* Start the recursive render from the top-level 'tree' returned by the API */}
@@ -202,19 +175,6 @@ function ModelsToolLeftComponent({ modelsData, modelsLoading, onSelectModel, sel
     </div>
   );
 }
-
-// Export memoized component to prevent unnecessary re-renders
-export const ModelsToolLeft = React.memo(ModelsToolLeftComponent, (prevProps, nextProps) => {
-  // Custom comparison to prevent re-renders if data hasn't changed
-  return (
-    prevProps.modelsData?.tree === nextProps.modelsData?.tree &&
-    prevProps.modelsLoading === nextProps.modelsLoading &&
-    prevProps.selectedModelId === nextProps.selectedModelId &&
-    prevProps.onSelectModel === nextProps.onSelectModel &&
-    prevProps.onRefresh === nextProps.onRefresh
-  );
-});
-ModelsToolLeft.displayName = 'ModelsToolLeft';
 
 export function ModelsToolRight({ selectedModel, allSessions, onNavigateToSession, platform }: any) {
   const [testResult, setTestResult] = React.useState<string | null>(null);
@@ -356,10 +316,17 @@ export function ModelsToolRight({ selectedModel, allSessions, onNavigateToSessio
 
         {(() => {
           // Filter the total session history to find matching provider/model pairs.
-          const matchingSessions = allSessions?.filter((s: any) => {
-            const sId = `${s.modelProvider}/${s.model}`;
-            return sId === selectedModel.id;
-          }).sort((a: any, b: any) => b.updatedAt - a.updatedAt) || [];
+          const matchingSessions = Array.from(
+            new Map(
+              allSessions
+                ?.filter((s: any) => {
+                  const sId = `${s.modelProvider}/${s.model}`;
+                  return sId === selectedModel.id;
+                })
+                .sort((a: any, b: any) => b.updatedAt - a.updatedAt)
+                .map((s: any) => [s.sessionId, s]) // Map uses sessionId as the unique key to prevent duplicates in case of multiple entries for the same sessionId
+            ).values()
+          ) || [];
 
           if (matchingSessions.length === 0) {
             return (

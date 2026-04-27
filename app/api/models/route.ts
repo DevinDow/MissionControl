@@ -4,7 +4,6 @@ import path from 'path';
 import { OPENCLAW_ROOT } from '../../lib/paths';
 
 export async function GET() {
-  const startTime = Date.now();
   try {
     // Load openclaw.json from the configured OpenClaw root directory
     const configPath = path.join(OPENCLAW_ROOT, 'openclaw.json');
@@ -33,7 +32,6 @@ export async function GET() {
     const fallbackList = openclawConfig.agents?.defaults?.model?.fallbacks || [];
     const tree: any[] = [];
 
-    const buildStart = Date.now();
     formattedData.forEach(modelEntry => {
       const parts = modelEntry.id.split('/');
       let currentLevel = tree;
@@ -86,9 +84,6 @@ export async function GET() {
         }
       });
     });
-    
-    const buildEnd = Date.now();
-    console.log(`[Models API] Tree built in ${buildEnd - buildStart}ms, Total time: ${buildEnd - startTime}ms, Models: ${formattedData.length}`);
     
     return NextResponse.json({
       models: formattedData,

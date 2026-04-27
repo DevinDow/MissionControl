@@ -296,46 +296,10 @@ export default function MissionControl() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Auto-select model when both modelStatus and modelsData are available
-  React.useEffect(() => {
-    if (activeTab === 'Models' && modelStatus?.modelId && modelsData?.tree && !selectedModel) {
-      // Search for model in the tree
-      const findModelInTree = (nodes: any[]): any | null => {
-        for (const node of nodes) {
-          if (node.type === 'model') {
-            // Check if this model matches by provider, host, and modelName
-            if (node.provider === modelStatus.provider &&
-                node.host === modelStatus.host &&
-                (node.model === modelStatus.modelName || node.name === modelStatus.modelName)) {
-              return node;
-            }
-            // Also check by ID as fallback
-            if (node.id === modelStatus.modelId) {
-              return node;
-            }
-          } else if (node.type === 'directory' && node.children) {
-            // Recursively search in subdirectories
-            const found = findModelInTree(node.children);
-            if (found) return found;
-          }
-        }
-        return null;
-      };
-
-      const matchedModel = findModelInTree(modelsData.tree);
-      if (matchedModel) {
-        setSelectedModel(matchedModel);
-      }
-    }
-  }, [activeTab, modelStatus, modelsData, selectedModel]);
-
   const fetchData = async (endpoint: string, setter: Function, loadingKey: string) => {
     const fetchStart = Date.now();
     if (endpoint.includes('sessions') || endpoint.includes('history') || endpoint.includes('content')) {
       console.log(`[Frontend] Fetching ${endpoint} ...`);
-    }
-    if (endpoint === '/api/models') {
-      console.log(`[Frontend] Fetching /api/models ...`);
     }
     setLoading(prev => ({ ...prev, [loadingKey]: true }));
     try {
@@ -343,9 +307,6 @@ export default function MissionControl() {
       const data = await res.json();
       if (endpoint.includes('sessions') || endpoint.includes('history') || endpoint.includes('content')) {
         console.log(`[Frontend] Fetched ${endpoint} in ${Date.now() - fetchStart}ms`);
-      }
-      if (endpoint === '/api/models') {
-        console.log(`[Frontend] Fetched /api/models in ${Date.now() - fetchStart}ms`);
       }
       if (endpoint.startsWith('/api/logs')) {
         if (endpoint.includes('logType=system')) {
@@ -913,7 +874,7 @@ export default function MissionControl() {
       case 'Help': return <HelpToolLeft setSelectedHelpId={setSelectedHelpId} setSelectedJobId={setSelectedJobId} setSelectedFilePath={setSelectedFilePath} setSelectedTaskId={setSelectedTaskId} setSelectedEventId={setSelectedEventId} setSelectedSessionId={setSelectedSessionId} selectedHelpId={selectedHelpId} />;
       case 'Old': return <OldToolLeft oldTree={oldTree} renderFileTree={renderFileTree} />;
       case 'Docs': return <DocsToolLeft docsTree={docsTree} renderFileTree={renderFileTree} />;
-      case 'Models': return <ModelsToolLeft modelsData={modelsData} modelsLoading={loading.models} onSelectModel={setSelectedModel} selectedModelId={selectedModel?.id} onRefresh={() => fetchData('/api/models', setModelsData, 'models')} />;
+      case 'Models': return <ModelsToolLeft modelsData={modelsData} modelsLoading={loading.models} onSelectModel={setSelectedModel} selectedModelId={selectedModel?.id} />;
       case 'Memory': return <MemoryToolLeft memoryTree={memoryTree} renderFileTree={renderFileTree} />;
       default: return null;
     }
@@ -1019,6 +980,7 @@ export default function MissionControl() {
                 if (item.name === 'Help') setSelectedHelpId('Links');
                 if (item.name === 'Git') setSelectedGitFile(null);
                 if (item.name === 'Models') {
+                  fetchData('/api/models', setModelsData, 'models');
                   setSelectedModel(null);
                 }
                 if (item.name === 'Memory') {

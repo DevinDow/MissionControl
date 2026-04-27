@@ -1,0 +1,31 @@
+{
+  "name": "mc",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "autoprefixer": "10.4.16",
+    "clsx": "latest",
+    "lucide-react": "latest",
+    "next": "^9.3.3",
+    "pnpm": "^10.33.2",
+    "postcss": "8.4.31",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "tailwind-merge": "latest",
+    "tailwindcss": "3.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.10.4",
+    "@types/react": "18.2.45",
+    "@types/react-dom": "18.2.18",
+    "typescript": "5.3.3"
+  }
+}

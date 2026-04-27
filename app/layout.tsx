@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "OpenClaw Mission Control",
-  description: "Personal Command Center",
+  title: "Mission Control",
+  description: "Tools for an OpenClaw Installation",
   manifest: "/manifest.json",
   icons: {
     icon: '/avatars/darvis_head_192.png',

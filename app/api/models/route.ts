@@ -1,9 +1,16 @@
 import { NextResponse } from 'next/server';
-import openclawConfig from '../../../../../openclaw.json' assert { type: 'json' };
+import fs from 'fs/promises';
+import path from 'path';
+import { OPENCLAW_ROOT } from '../../lib/paths';
 
 export async function GET() {
   const startTime = Date.now();
   try {
+    // Load openclaw.json from the configured OpenClaw root directory
+    const configPath = path.join(OPENCLAW_ROOT, 'openclaw.json');
+    const configData = await fs.readFile(configPath, 'utf-8');
+    const openclawConfig = JSON.parse(configData);
+    
     // Extract models data from the configuration
     const modelsData = openclawConfig.agents.defaults.models;
     
@@ -89,9 +96,15 @@ export async function GET() {
       platform: process.platform
     });
   } catch (error) {
+    const configPath = path.join(OPENCLAW_ROOT, 'openclaw.json');
     console.error('Failed to fetch models data:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to load models data' },
+      { 
+        error: 'Failed to load models data',
+        details: errorMessage,
+        configPath: configPath
+      },
       { status: 500 }
     );
   }

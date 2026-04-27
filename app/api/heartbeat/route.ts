@@ -1,6 +1,9 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { NextResponse } from 'next/server';
+import fs from 'fs/promises';
+import path from 'path';
+import { OPENCLAW_ROOT } from '../../lib/paths';
 
 export async function GET() {
   try {
@@ -8,13 +11,15 @@ export async function GET() {
     let interval = '?';
     let activeHours = null;
     try {
-      const openclawPath = join(process.env.HOME || '/root', '.openclaw', 'openclaw.json');
-      const config = JSON.parse(readFileSync(openclawPath, 'utf-8'));
+      const configPath = path.join(OPENCLAW_ROOT, 'openclaw.json');
+      const configData = await fs.readFile(configPath, 'utf-8');
+      const openclawConfig = JSON.parse(configData);
+
       // Heartbeat config is system-wide and typically lives under agents.defaults.
       // Keep a fallback to legacy/alternate locations for compatibility.
       const heartbeatConfig =
-        config.agents?.defaults?.heartbeat ??
-        config.agents?.main?.heartbeat;
+        openclawConfig.agents?.defaults?.heartbeat ??
+        openclawConfig.agents?.main?.heartbeat;
       if (heartbeatConfig) {
         interval = heartbeatConfig.every;
         activeHours = heartbeatConfig.activeHours;

@@ -12,6 +12,20 @@ It was vibe-coded with 🦾Darvis in a single day while I watched TV, which was 
 - **[Lucide React](https://lucide.dev/guide/packages/lucide-react)**: Icon library for the sidebar and UI elements.
 - **[TypeScript](https://www.typescriptlang.org/docs/)**: Ensures type safety across the project.
 
+## ⚙️ Configuration
+
+Mission Control now runs as a separate repository. To connect it to your OpenClaw folder:
+
+1. Copy `.env.example` to `.env.local`
+2. Edit `.env.local` and set `OPENCLAW_PATH` to your OpenClaw folder location
+
+**Example (.env.local):**
+```
+OPENCLAW_PATH=~/.openclaw
+```
+
+See [CONFIGURATION.md](CONFIGURATION.md) for detailed setup instructions.
+
 ## 🏗️ Layout Structure
 
 The application follows a three-column layout pattern:
